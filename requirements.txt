@@ -1,0 +1,7 @@
+fastapi[all]
+passlib
+argon2-cffi
+
+redis
+sqlmodel
+psycopg2
