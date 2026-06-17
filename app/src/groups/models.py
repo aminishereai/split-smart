@@ -16,7 +16,7 @@ class Groups(SQLModel , table=True):
 
 class UserGroupJunction(SQLModel , table= True):
     user_id : int = Field(foreign_key="users.id", primary_key=True)
-    group_id : int = Field(foreign_key="group.id", primary_key=True)
+    group_id : int = Field(foreign_key="groups.id", primary_key=True)
     role : Roles = Field(index=True)
 
 
