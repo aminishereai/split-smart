@@ -16,7 +16,7 @@ credentials_exception = lambda name :  HTTPException(
 
 
 
-def create_user(user : UsersCreate , session : SessionDep)-> Token:
+def create_user(user : UsersCreate , session : SessionDep)-> Users:
     statement = select(Users).where(Users.name == user.name)
     existing_user = session.exec(statement).one_or_none()
     # Checks for existing user
@@ -41,15 +41,13 @@ def create_user(user : UsersCreate , session : SessionDep)-> Token:
     if not authenticated_user:
         raise credentials_exception(user.name)
     
-    data = {"sub" : authenticated_user.name}
-
-    return create_access_token(data)
+    return authenticated_user
 
 
 def login_user(
         form_data : Annotated[OAuth2PasswordRequestForm , Depends()],
         session : SessionDep,
-) -> Token:
+) -> Users:
     authenticated_user = authenticate_user(
         username=form_data.username,
         password=form_data.password,
@@ -58,14 +56,12 @@ def login_user(
     if not authenticated_user:
         raise credentials_exception(form_data.username)
     
-    data = {"sub" : authenticated_user.name}
-
-    return create_access_token(data)
+    return authenticated_user
 
 
 
 
 
 
-LoginUserDep = Annotated[Token , Depends(login_user) ]
-CreateUserDep = Annotated[Token , Depends(create_user) ]
+LoginUserDep = Annotated[Users , Depends(login_user) ]
+CreateUserDep = Annotated[Users , Depends(create_user) ]

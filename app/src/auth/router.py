@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter
+
 
 from app.src.auth import models
-from app.src.auth.dependencies import CreateUserDep
+from app.src.auth.dependencies import CreateUserDep, LoginUserDep
+from app.src.auth.services import create_access_token
 
 
 router = APIRouter(
@@ -12,8 +13,16 @@ router = APIRouter(
 
 # For Creating user
 @router.post("/create" ,  response_model=models.Token)
-def create_user(token : CreateUserDep):
-    return token
+def create_user(user : CreateUserDep):
+    data = {"sub" : user.name}
+
+    return create_access_token(data)
+
+@router.post("/login" , response_model=models.Token)
+def login(user : LoginUserDep):
+    data = {"sub" : user.name}
+
+    return create_access_token(data)
 
 
 
