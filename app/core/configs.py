@@ -1,7 +1,7 @@
-from dataclasses import dataclass
-from typing import List, Literal, LiteralString
+import json
+from typing import List, Literal, Union
 
-from pydantic import Field, PostgresDsn
+from pydantic import Field, PostgresDsn, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -26,12 +26,26 @@ class Settings(BaseSettings):
     
     # Security settings
     secret_key: str = Field(default="Aabracadabra", description="Secret key for JWT or session signing")
-    access_token_expire_minutes : int = int(Field(default= 15 , description="Maximum validity duration of a given access token"))
+    access_token_expire_minutes : int = (Field(default= 15 , description="Maximum validity duration of a given access token"))
     algorithm : str = Field(default="HS256" , description="Hashing Algorithm")
     allowed_hosts: List[str] = Field(default=["localhost"], description="Allowed hostnames")
 
     # Debug mode
     debug: bool = Field(default=False, description="Enable debug mode")
+
+    @field_validator("allowed_hosts", mode="before")
+    def parse_hosts(cls, v: Union[str, List[str]]):
+        if isinstance(v, list):
+            return v
+        v = v.strip()
+        # Try JSON parsing first
+        if v.startswith("[") and v.endswith("]"):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                pass
+        # Fallback: comma-split
+        return [item.strip() for item in v.split(",") if item.strip()]
 
     # Pydantic settings config
     model_config = SettingsConfigDict(

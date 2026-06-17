@@ -8,6 +8,7 @@ dependencies = [
     "argon2-cffi>=25.1.0",
     "fastapi[all]>=0.136.3",
     "passlib>=1.7.4",
+    "psycopg>=3.3.4",
     "psycopg2>=2.9.12",
     "pyjwt>=2.13.0",
     "pytest>=9.0.3",

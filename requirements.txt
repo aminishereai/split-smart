@@ -1,8 +1,8 @@
 fastapi[all]
 passlib
 argon2-cffi
-
+pydantic-settings
 redis
 sqlmodel
-psycopg2
+psycopg2-binary
 pyjwt
