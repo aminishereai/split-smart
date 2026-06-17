@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
 from app.core.database import SessionDep
@@ -15,7 +16,7 @@ credentials_exception = lambda name :  HTTPException(
 
 
 
-def create_user(user : UsersCreate , session : SessionDep):
+def create_user(user : UsersCreate , session : SessionDep)-> Token:
     statement = select(Users).where(Users.name == user.name)
     existing_user = session.exec(statement).one_or_none()
     # Checks for existing user
@@ -43,6 +44,28 @@ def create_user(user : UsersCreate , session : SessionDep):
     data = {"sub" : authenticated_user.name}
 
     return create_access_token(data)
-    
 
+
+def login_user(
+        form_data : Annotated[OAuth2PasswordRequestForm , Depends()],
+        session : SessionDep,
+) -> Token:
+    authenticated_user = authenticate_user(
+        username=form_data.username,
+        password=form_data.password,
+        session=session
+    )
+    if not authenticated_user:
+        raise credentials_exception(form_data.username)
+    
+    data = {"sub" : authenticated_user.name}
+
+    return create_access_token(data)
+
+
+
+
+
+
+LoginUserDep = Annotated[Token , Depends(login_user) ]
 CreateUserDep = Annotated[Token , Depends(create_user) ]
