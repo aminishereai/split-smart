@@ -12,8 +12,7 @@ class Roles(str , Enum):
 class Groups(SQLModel , table=True):
     id : Optional[int] = Field(primary_key = True)
     name : str = Field(index=True)
-    invite_code : str
-
+    invite_code : Optional[str] = None
 
 class UserGroupJunction(SQLModel , table= True):
     user_id : int = Field(foreign_key="users.id", primary_key=True)
@@ -30,6 +29,6 @@ class GroupsIn(SQLModel):
 class GroupsOut(SQLModel):
     id : int
     name : str
-    
+
 
 
