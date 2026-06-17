@@ -11,12 +11,12 @@ class Roles(str , Enum):
 # Tables 
 class Groups(SQLModel , table=True):
     id : Optional[int] = Field(default = None ,primary_key = True)
-    name : str = Field(index=True)
+    name : str = Field(index=True, unique=True)
     invite_code : Optional[str] = None
 
 class UserGroupJunction(SQLModel , table= True):
-    user_id : int = Field(foreign_key="users.id", primary_key=True)
-    group_id : int = Field(foreign_key="groups.id", primary_key=True)
+    user_id : int = Field(foreign_key="users.id", primary_key=True, ondelete="CASCADE")
+    group_id : int = Field(foreign_key="groups.id", primary_key=True, ondelete="CASCADE")
     role : Roles = Field(index=True)
 
 
