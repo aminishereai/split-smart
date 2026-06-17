@@ -9,8 +9,10 @@ from app.src.groups.services import add_session
 
 
 def make_group(group : GroupsIn ,session : SessionDep)-> Groups:
-    group_db = Groups.model_validate(group)
-    group_db.invite_code = str(uuid4())[:10]
+    group_db = Groups(
+        name = group.name,
+        invite_code = str(uuid4())[:10]
+    )
     group_db = add_session(group_db , session)
     return group_db
 

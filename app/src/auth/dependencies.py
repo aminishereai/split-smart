@@ -7,7 +7,7 @@ from sqlmodel import select
 
 from app.core.database import SessionDep
 from app.src.auth.models import Token, Users, UsersCreate
-from app.src.auth.services import ALGORITHM, SECRET_KEY, authenticate_user, create_access_token
+from app.src.auth.services import ALGORITHM, SECRET_KEY, authenticate_user, create_access_token, hash_password
 
 credentials_exception = lambda name , **kwargs :  HTTPException(
     status_code= status.HTTP_401_UNAUTHORIZED,
@@ -47,7 +47,11 @@ def create_user(user : UsersCreate , session : SessionDep)-> Users:
             detail = f"Username : {user.name} already Exists"
         )
     # Creates new user
-    user_db = Users.model_validate(user)
+    user_db = Users(
+        name=user.name,
+        email=user.email,
+        hash_pwd=hash_password(user.password)
+    )
     session.add(user_db)
     session.commit()
     session.refresh(user_db)
