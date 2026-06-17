@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 
 from app.src.auth import models
-from app.src.auth.dependencies import CreateUserDep, LoginUserDep
+from app.src.auth.dependencies import CreateUserDep, CurrentUserDep, LoginUserDep
 from app.src.auth.services import create_access_token
 
 
@@ -23,6 +23,11 @@ def login(user : LoginUserDep):
     data = {"sub" : user.name}
 
     return create_access_token(data)
+
+
+@router.get("me/" , response_model=models.UsersOut)
+def get_me(me : CurrentUserDep):
+    return me
 
 
 
