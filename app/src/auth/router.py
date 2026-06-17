@@ -7,7 +7,7 @@ from app.src.auth.services import create_access_token
 
 
 router = APIRouter(
-    prefix = "auth/",
+    prefix = "/auth",
     tags=["Authentication" , "User"]
 )
 
