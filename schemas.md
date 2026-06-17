@@ -18,6 +18,7 @@
     ```python
     id : int # primary key
     name : str
+    invite_code : str
 
     ```
 - ***User_Group junction-table***
