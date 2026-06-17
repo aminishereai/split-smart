@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 #creating group
-@router.post("/",response_model=GroupsOut , status_code=status.HTTP_201_CREATED )
+@router.post("/",response_model=UserGroupJunction , status_code=status.HTTP_201_CREATED )
 def create_group(group : GroupsIn, session: SessionDep, user : CurrentUserDep):
     group_db = make_group(group , session)
 
