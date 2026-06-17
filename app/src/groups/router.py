@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request , status
-from psycopg2 import IntegrityError
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 from app.core.database import SessionDep

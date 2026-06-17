@@ -62,7 +62,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             "url" : url,
             "id" : id
         }
-        logger.info("Request : {method} {url} from {client_ip}" , extra ={"type" : "Request","info" : req_info})
+        logger.info(f"Request : {method} {url} from {client_ip}" , extra ={"type" : "Request","info" : req_info})
 
         response = await call_next(request)
 
