@@ -62,8 +62,8 @@ def invite(group_id : int , session : SessionDep , request : Request , user : Cu
     # Check if user is in the group
     assert user.id is not None
     statement = select(UserGroupJunction).where(
-        (UserGroupJunction.user_id == user.id) and 
-        (UserGroupJunction.group_id == group_id)
+        UserGroupJunction.user_id == user.id,
+        UserGroupJunction.group_id == group_id
     )
     membership = session.exec(statement).one_or_none()
     
