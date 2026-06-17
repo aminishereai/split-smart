@@ -1,8 +1,10 @@
+from typing import Annotated
+
 from fastapi import Depends, HTTPException, status
 from sqlmodel import select
 
 from app.core.database import SessionDep
-from app.src.auth.models import Users, UsersCreate
+from app.src.auth.models import Token, Users, UsersCreate
 from app.src.auth.services import authenticate_user, create_access_token
 
 credentials_exception = lambda name :  HTTPException(
@@ -43,4 +45,4 @@ def create_user(user : UsersCreate , session : SessionDep):
     return create_access_token(data)
     
 
-    
+CreateUserDep = Annotated[Token , Depends(create_user) ]
