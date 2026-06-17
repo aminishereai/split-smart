@@ -1,9 +1,11 @@
+from typing import Optional
+
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
 
 # Databases
 class Users(SQLModel , table=True):
-    id : int = Field(primary_key=True , nullable=False)
+    id : Optional[int] = Field(default= None ,primary_key=True)
     name : str
     email : EmailStr
     hash_pwd : str

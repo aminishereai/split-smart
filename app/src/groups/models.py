@@ -1,12 +1,35 @@
+from enum import Enum
+from typing import Literal, Optional
+
 from sqlmodel import Field, SQLModel
+
+#Seperate Enum for the roles type
+class Roles(str , Enum):
+    admin = "admin"
+    member = "member"
 
 # Tables 
 class Groups(SQLModel , table=True):
-    id : int = Field(primary_key = True)
+    id : Optional[int] = Field(primary_key = True)
     name : str = Field(index=True)
     invite_code : str
 
+
+class UserGroupJunction(SQLModel , table= True):
+    user_id : int = Field(foreign_key="users.id", primary_key=True)
+    group_id : int = Field(foreign_key="group.id", primary_key=True)
+    role : Roles = Field(index=True)
+
+
+
+
 # And the schemas ....
-class GroupsCreate(SQLModel):
+class GroupsIn(SQLModel):
     name : str
+
+class GroupsOut(SQLModel):
+    id : int
+    name : str
+    
+
 
