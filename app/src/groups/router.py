@@ -41,19 +41,25 @@ def get_invited(group_id : int , invitation_code : str , user : CurrentUserDep ,
             detail= f"The group you're looking for was not found"
         )
     assert user.id and valid_group.id is not None
-    try :
-        junction = UserGroupJunction(
+    
+    # Check if user is already a member
+    existing = select(UserGroupJunction).where(
+        UserGroupJunction.user_id == user.id,
+        UserGroupJunction.group_id == group_id
+    )
+    if session.exec(existing).one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"You are already a member of group : {valid_group.name}"
+        )
+    
+    junction = UserGroupJunction(
         user_id=user.id,
         group_id=valid_group.id,
         role=Roles.member
     )
-        junction : UserGroupJunction = add_session(junction , session)
-        return junction
-    except IntegrityError as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"You are already the member of group : {valid_group.name}"
-        )        
+    junction = add_session(junction , session)
+    return junction        
     
     
 
