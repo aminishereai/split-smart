@@ -1,9 +1,16 @@
+from datetime import timedelta , datetime
+
+import jwt
 from passlib.context import CryptContext
 from sqlmodel import select
 
+from app.core import configs
 from app.core.database import SessionDep
-from app.src.auth.models import Users
+from app.src.auth.models import Token, Users
 
+SECRET_KEY = configs.settings.secret_key
+ACCESS_TOKEN_EXPIRE_MINUTES = configs.settings.access_token_expire_minutes
+ALGORITHM = configs.settings.algorithm
 
 pwd_context = CryptContext(
     ["argon2"],
@@ -37,3 +44,14 @@ def authenticate_user(
 
     return user
 
+def create_access_token(data: dict, exp: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
+    payload = data.copy()
+    payload["exp"] = datetime.now() + exp
+
+    token = jwt.encode(
+        payload,
+        SECRET_KEY,
+        ALGORITHM
+    )
+
+    return Token(access_token=token , token_type="bearer")

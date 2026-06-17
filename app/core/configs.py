@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     
     # Security settings
     secret_key: str = Field(default="Aabracadabra", description="Secret key for JWT or session signing")
+    access_token_expire_minutes : int = int(Field(default= 15 , description="Maximum validity duration of a given access token"))
+    algorithm : str = Field(default="HS256" , description="Hashing Algorithm")
     allowed_hosts: List[str] = Field(default=["localhost"], description="Allowed hostnames")
 
     # Debug mode
