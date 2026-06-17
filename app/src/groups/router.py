@@ -58,9 +58,25 @@ def get_invited(group_id : int , invitation_code : str , user : CurrentUserDep ,
     
 
 @router.get("/{group_id}/invite")
-def invite(group_id : int , session : SessionDep , request : Request):
+def invite(group_id : int , session : SessionDep , request : Request , user : CurrentUserDep):
+    # Check if user is in the group
+    assert user.id is not None
+    statement = select(UserGroupJunction).where(
+        (UserGroupJunction.user_id == user.id) and 
+        (UserGroupJunction.group_id == group_id)
+    )
+    membership = session.exec(statement).one_or_none()
+    
+    if not membership:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"You are not a member of this group"
+        )
+    
+    # Get the invitation code
     statement = select(Groups.invite_code).where(Groups.id == group_id)
     code = session.exec(statement).one_or_none()
+    
     return {
         "invitation_link" : request.url_for("get_invited" , group_id=group_id , invitation_code= code)
     }
