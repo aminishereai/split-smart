@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter , status
 
 
 from app.src.auth import models
@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 # For Creating user
-@router.post("/create" ,  response_model=models.Token)
+@router.post("/create" ,  response_model=models.Token , status_code=status.HTTP_201_CREATED)
 def create_user(user : CreateUserDep):
     data = {"sub" : user.name}
 
