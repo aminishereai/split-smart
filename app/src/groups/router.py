@@ -4,7 +4,7 @@ from sqlmodel import select
 
 from app.core.database import SessionDep
 from app.src.auth.dependencies import CurrentUserDep
-from app.src.groups.dependencies import make_group, verify_group
+from app.src.groups.dependencies import delete_group, make_group, verify_group
 from app.src.groups.models import Groups, GroupsIn, GroupsOut, UserGroupJunction, Roles
 from app.src.groups.services import add_session
 
@@ -86,3 +86,17 @@ def invite(group_id : int , session : SessionDep , request : Request , user : Cu
     return {
         "invitation_link" : request.url_for("get_invited" , group_id=group_id , invitation_code= code)
     }
+
+@router.delete("/{group_id}")
+def del_group(group_id : int , session : SessionDep , user : CurrentUserDep ):
+    statement = select(Groups).where(Groups.id == group_id)
+    group = session.exec(statement).one_or_none()
+
+    if not group :
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Group with id {group_id} not found"
+        )
+
+    deleted = delete_group(group , user , session)
+    return {"deleted" : deleted }

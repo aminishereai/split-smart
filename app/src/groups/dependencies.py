@@ -6,7 +6,7 @@ from sqlmodel import select
 
 from app.core.database import SessionDep
 from app.src.auth.models import Users
-from app.src.groups.models import Groups, GroupsIn
+from app.src.groups.models import Groups, GroupsIn, Roles, UserGroupJunction
 from app.src.groups.services import add_session
 
 
@@ -29,3 +29,23 @@ def verify_group(group_id : int , invitation_code : str , session : SessionDep):
     v_group = session.exec(statement).one_or_none()
     return v_group
 
+def delete_group(group : Groups  , user : Users, session : SessionDep)-> bool:
+    statement = select(UserGroupJunction).where(UserGroupJunction.user_id == user.id , UserGroupJunction.group_id == group.id)
+    junc = session.exec(statement).one_or_none()
+    if not junc :
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Group {group.name} with user {user.name} not found"
+        )
+    
+    is_admin : bool = junc.role == Roles.admin
+
+    if not is_admin :
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"User : {user.name} is not authorized to delete the group {group.name}."
+        )
+    
+    session.delete(group)
+    session.commit()
+    return True
