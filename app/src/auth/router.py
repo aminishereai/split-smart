@@ -25,7 +25,7 @@ def login(user : LoginUserDep):
     return create_access_token(data)
 
 
-@router.get("me/" , response_model=models.UsersOut)
+@router.get("/me" , response_model=models.UsersOut)
 def get_me(me : CurrentUserDep):
     return me
 
