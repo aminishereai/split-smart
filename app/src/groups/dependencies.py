@@ -1,3 +1,4 @@
+from typing import Sequence
 from uuid import uuid4
 
 from fastapi import HTTPException , status
@@ -62,3 +63,8 @@ def list_members(group_id : int , session : Session):
         )
     
     return members
+
+def list_groups(session : Session  , user : Users) -> Sequence[Groups]:
+    statement = select(Groups).join(UserGroupJunction).where(UserGroupJunction.user_id == user.id)
+    groups = session.exec(statement).all()
+    return groups

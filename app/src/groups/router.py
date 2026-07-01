@@ -7,7 +7,7 @@ from sqlmodel import select
 from app.core.database import SessionDep
 from app.src.auth.dependencies import CurrentUserDep
 from app.src.auth.models import Users
-from app.src.groups.dependencies import delete_group, list_members, make_group, verify_group
+from app.src.groups.dependencies import delete_group, list_groups, list_members, make_group, verify_group
 from app.src.groups.models import Groups, GroupsIn, GroupsOut, UserGroupJunction, Roles
 from app.src.groups.services import add_session
 
@@ -33,6 +33,12 @@ def create_group(group : GroupsIn, session: SessionDep, user : CurrentUserDep):
 
 
     return junction
+
+
+@router.get("/" , response_model=List[Groups])
+def get_groups(session : SessionDep , user : CurrentUserDep):
+    groups = list_groups(session , user)
+    return groups
 
 
 @router.get("/{group_id}/invite/{invitation_code}")
