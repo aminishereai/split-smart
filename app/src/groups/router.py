@@ -1,12 +1,11 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException, Request , status
-from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 from app.core.database import SessionDep
 from app.src.auth.dependencies import CurrentUserDep
-from app.src.auth.models import Users
+from app.src.auth.models import UsersOut
 from app.src.groups.dependencies import delete_group, list_groups, list_members, make_group, verify_group
 from app.src.groups.models import Groups, GroupsIn, GroupsOut, UserGroupJunction, Roles
 from app.src.groups.services import add_session
@@ -35,7 +34,7 @@ def create_group(group : GroupsIn, session: SessionDep, user : CurrentUserDep):
     return junction
 
 
-@router.get("/" , response_model=List[Groups])
+@router.get("/" , response_model=List[GroupsOut])
 def get_groups(session : SessionDep , user : CurrentUserDep):
     groups = list_groups(session , user)
     return groups
@@ -97,7 +96,7 @@ def invite(group_id : int , session : SessionDep , request : Request , user : Cu
     }
 
 
-@router.get("/{group_id}/members" , response_model=List[Users])
+@router.get("/{group_id}/members" , response_model=List[UsersOut])
 def list_users(group_id : int ,user : CurrentUserDep, session : SessionDep):
     members = list_members(group_id , session)
     if not user in members :
