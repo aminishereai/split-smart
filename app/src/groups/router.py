@@ -1,10 +1,13 @@
+from typing import List
+
 from fastapi import APIRouter, HTTPException, Request , status
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 from app.core.database import SessionDep
 from app.src.auth.dependencies import CurrentUserDep
-from app.src.groups.dependencies import delete_group, make_group, verify_group
+from app.src.auth.models import Users
+from app.src.groups.dependencies import delete_group, list_members, make_group, verify_group
 from app.src.groups.models import Groups, GroupsIn, GroupsOut, UserGroupJunction, Roles
 from app.src.groups.services import add_session
 
@@ -86,6 +89,18 @@ def invite(group_id : int , session : SessionDep , request : Request , user : Cu
     return {
         "invitation_link" : request.url_for("get_invited" , group_id=group_id , invitation_code= code)
     }
+
+
+@router.get("/{group_id}/members" , response_model=List[Users])
+def list_users(group_id : int ,user : CurrentUserDep, session : SessionDep):
+    members = list_members(group_id , session)
+    if not user in members :
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"User : {user.name} is not in the group with id : {group_id}."
+        )
+    return members
+
 
 @router.delete("/{group_id}")
 def del_group(group_id : int , session : SessionDep , user : CurrentUserDep ):

@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from fastapi import HTTPException , status
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import select
+from sqlmodel import Session, select
 
 from app.core.database import SessionDep
 from app.src.auth.models import Users
@@ -49,3 +49,16 @@ def delete_group(group : Groups  , user : Users, session : SessionDep)-> bool:
     session.delete(group)
     session.commit()
     return True
+
+
+def list_members(group_id : int , session : Session):
+    statement = select(Users).join(UserGroupJunction).where(UserGroupJunction.group_id == group_id)
+    members = session.exec(statement).all()
+    
+    if not members:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail= f"Group with id {group_id} not found or has no members."
+        )
+    
+    return members
