@@ -18,7 +18,7 @@ class Expenses(SQLModel , table=True):
     split_type : Split
 
 class ExpenseSplit(SQLModel ,table=True) :
-    user_id : int = Field(foreign_key="users.id" , ondelete="CASCADE")
+    user_id : int = Field(foreign_key="users.id" , primary_key=True , ondelete="CASCADE")
     expense_id : int = Field(foreign_key="expenses.id" , primary_key=True, ondelete="CASCADE")
     decided_amt : Decimal = Field(max_digits=10 , decimal_places=2) 
   
