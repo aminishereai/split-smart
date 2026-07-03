@@ -2,6 +2,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import  Optional
 
+from fastapi import HTTPException
 from pydantic import model_validator
 from sqlmodel import Field, SQLModel
 
@@ -38,15 +39,15 @@ class ExpenseIn(SQLModel):
     def validate_split(self):
         if self.split_type == Split.disproportionate :
             if not self.splits :
-                raise ValueError("Splits of individual users required for disproportionate split.")
+                raise HTTPException(status_code=422 , detail=f"Splits of individual users required for disproportionate split.")
             
             total = sum(x.percentage for x in self.splits)
             if abs(total - 100) > 0.01 :
-                raise ValueError("Percentage must sum to 100")
+                raise HTTPException(status_code=422 , detail=f"Percentage must sum to 100")
             
         if self.split_type == Split.equal :
             if self.splits :
-                raise ValueError("Splits not required for equal split.")
+                raise HTTPException(status_code=422 , detail=f"Splits not required for equal split.")
         
         return self
 

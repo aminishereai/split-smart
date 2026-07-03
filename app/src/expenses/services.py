@@ -1,12 +1,14 @@
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Sequence
 
+from fastapi import HTTPException
+
 from app.src.expenses.models import ExpenseIn, ExpenseSplit, Split
 
 
 def splitter(expense: ExpenseIn, user_id: int, expense_id: int, member_ids: Sequence[int]):
     if not member_ids:
-        raise ValueError("Group must have at least one member.")
+        raise HTTPException(status_code=422, detail=f"Group must have at least one member.")
 
     total_amt: Decimal = expense.total_amt
     payer_id = user_id
@@ -15,13 +17,13 @@ def splitter(expense: ExpenseIn, user_id: int, expense_id: int, member_ids: Sequ
 
     if expense.split_type == Split.disproportionate:
         if not expense.splits:
-            raise ValueError("Splits are required for a disproportionate split.")
+            raise HTTPException(status_code=422, detail=f"Splits are required for a disproportionate split.")
         if len(expense.splits) != n:
-            raise ValueError("Number of split entries must match group members.")
+            raise HTTPException(status_code=422, detail=f"Number of split entries must match group members.")
 
         split_map = {split.user_id: split.percentage for split in expense.splits}
         if set(split_map) != set(member_ids):
-            raise ValueError("Split entries must include every group member.")
+            raise HTTPException(status_code=422, detail=f"Split entries must include every group member.")
 
         decided_amts = [
             (total_amt * Decimal(split_map[user_id]) / Decimal("100")).quantize(
