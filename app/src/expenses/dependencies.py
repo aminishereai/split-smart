@@ -38,4 +38,10 @@ def add_expense (expense_data :ExpenseIn , session : Session , user_id : int , g
         n=n,
     )
 
+    session.add_all(expense_split)
+    session.commit()
+    for exp_split in expense_split:
+        session.refresh(exp_split)
+    
+
     return expense_split
