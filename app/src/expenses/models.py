@@ -1,13 +1,18 @@
 from decimal import Decimal
 from enum import Enum
-from typing import Optional
+from typing import  Optional
 
+from pydantic import model_validator
 from sqlmodel import Field, SQLModel
 
 
 class Split(str , Enum):
     disproportionate = "disproportionate"
     equal = "equal"
+
+class SplitIn(SQLModel):
+    user_id :int
+    percentage : int = Field(ge=0, le=100)
 
 # Tables 
 class Expenses(SQLModel , table=True):
@@ -24,7 +29,24 @@ class ExpenseSplit(SQLModel ,table=True) :
   
 # Schemas
 class ExpenseIn(SQLModel):
-    group_id : int 
     total_amt : Decimal = Field(max_digits=10 , decimal_places=2)
     split_type : Split
+    splits : Optional[list[SplitIn]] = None
+
+
+    @model_validator(mode="after")
+    def validate_split(self):
+        if self.split_type == Split.disproportionate :
+            if not self.splits :
+                raise ValueError("Splits of individual users required for disproportionate split.")
+            
+            total = sum(x.percentage for x in self.splits)
+            if abs(total - 100) > 0.01 :
+                raise ValueError("Percentage must sum to 100")
+            
+        if self.split_type == Split.equal :
+            if self.splits :
+                raise ValueError("Splits not required for equal split.")
+        
+        return self
 
