@@ -29,7 +29,7 @@ class ExpenseSplit(SQLModel ,table=True) :
   
 # Schemas
 class ExpenseIn(SQLModel):
-    total_amt : Decimal = Field(max_digits=10 , decimal_places=2)
+    total_amt : int
     split_type : Split
     splits : Optional[list[SplitIn]] = None
 
