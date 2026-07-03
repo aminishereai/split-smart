@@ -26,7 +26,8 @@ def make_group(group : GroupsIn ,session : SessionDep)-> Groups:
         )    
 
 def verify_group(group_id : int , invitation_code : str , session : SessionDep):
-    statement = select(Groups).where((Groups.id == group_id) and (Groups.invite_code == invitation_code))
+    # SQLAlchemy/SQLModel requires combining conditions with bitwise operators
+    statement = select(Groups).where((Groups.id == group_id) & (Groups.invite_code == invitation_code))
     v_group = session.exec(statement).one_or_none()
     return v_group
 
