@@ -46,3 +46,22 @@ def add_expense (expense_data :ExpenseIn , session : Session , user_id : int , g
     
 
     return expense_split
+
+def list_group_expences(session : Session , user_id : int, group_id : int):
+    val_statement = select(UserGroupJunction.group_id).where(UserGroupJunction.user_id == user_id)
+    group_ids = session.exec(val_statement).all()
+
+    if not (group_id in group_ids):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=f"User cant access the expense details of the group."
+        )
+
+    statement = select(Expenses).where(Expenses.group_id == group_id)
+    expences = session.exec(statement).all()
+    return expences
+
+def list_user_expences(session : Session , user_id : int):
+    statement = select(Expenses).where(Expenses.user_id == user_id)
+    expences = session.exec(statement).all()
+    return expences
