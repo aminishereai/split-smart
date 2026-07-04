@@ -48,13 +48,13 @@ def add_expense (expense_data :ExpenseIn , session : Session , user_id : int , g
     return expense_split
 
 def list_group_expences(session : Session , user_id : int, group_id : int):
-    val_statement = select(UserGroupJunction.group_id).where(UserGroupJunction.user_id == user_id)
-    group_ids = session.exec(val_statement).all()
+    val_statement = select(UserGroupJunction.user_id).where(UserGroupJunction.group_id == group_id)
+    user_ids = session.exec(val_statement).all()
 
-    if not (group_id in group_ids):
+    if not (user_id in user_ids):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=f"User cant access the expense details of the group."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"User with id: {user_id} is not authorized to access the expense details of the group.Requires user being member of group"
         )
 
     statement = select(Expenses).where(Expenses.group_id == group_id)

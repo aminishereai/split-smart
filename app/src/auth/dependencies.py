@@ -6,19 +6,19 @@ import jwt
 from sqlmodel import select
 
 from app.core.database import SessionDep
+from app.src.auth.exceptions import UserAlreadyExists, UserNotAuthorized, UserNotFound
 from app.src.auth.models import Token, Users, UsersCreate
 from app.src.auth.services import ALGORITHM, SECRET_KEY, authenticate_user, create_access_token, hash_password
 
-credentials_exception = lambda name , **kwargs :  HTTPException(
+credentials_exception = HTTPException(
     status_code= status.HTTP_401_UNAUTHORIZED,
-    detail= f"{name} is not authorized",
-    **kwargs
+    detail= f"User is not authorized",
+    headers={"WWW-Authenticate": "Bearer"}
 )
 
 oauth2_scheme = OAuth2PasswordBearer("auth/login/")
 
 def get_current_user(token : Annotated[str , Depends(oauth2_scheme)] , session : SessionDep) -> Users:
-    cred_exp = credentials_exception("User" , headers={"WWW-Authenticate": "Bearer"})
     try : 
         payload = jwt.decode(token , SECRET_KEY , [ALGORITHM])
         username = payload.get("sub")
@@ -26,15 +26,12 @@ def get_current_user(token : Annotated[str , Depends(oauth2_scheme)] , session :
         user = session.exec(statement).one_or_none()
         # Checks for existing user
         if not user :
-            raise HTTPException(
-                status_code= status.HTTP_404_NOT_FOUND,
-                detail = f"Username : {username} does not Exists"
-            )
+            raise UserNotFound(username=username)
         
         return user
 
     except Exception:
-        raise cred_exp
+        raise credentials_exception
     
 
 def create_user(user : UsersCreate , session : SessionDep)-> Users:
@@ -42,10 +39,7 @@ def create_user(user : UsersCreate , session : SessionDep)-> Users:
     existing_user = session.exec(statement).one_or_none()
     # Checks for existing user
     if existing_user :
-        raise HTTPException(
-            status_code= status.HTTP_409_CONFLICT,
-            detail = f"Username : {user.name} already Exists"
-        )
+        raise UserAlreadyExists(username=user.name)
     # Creates new user
     user_db = Users(
         name=user.name,
@@ -64,7 +58,7 @@ def create_user(user : UsersCreate , session : SessionDep)-> Users:
         session=session
     )
     if not authenticated_user:
-        raise credentials_exception(user.name)
+        raise UserNotAuthorized(username=user.name , feature="login" )
     
     return authenticated_user
 
@@ -79,7 +73,7 @@ def login_user(
         session=session
     )
     if not authenticated_user:
-        raise credentials_exception(form_data.username)
+        raise UserNotAuthorized(username=form_data.username , feature="login")
     
     return authenticated_user
 
