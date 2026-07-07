@@ -3,6 +3,7 @@ from typing import Sequence
 
 from fastapi import HTTPException
 
+from app.src.expenses.exceptions import SplitsInputConflict, SplitsRequiredError
 from app.src.expenses.models import ExpenseIn, ExpenseSplit, Split
 
 
@@ -17,13 +18,13 @@ def splitter(expense: ExpenseIn, user_id: int, expense_id: int, member_ids: Sequ
 
     if expense.split_type == Split.disproportionate:
         if not expense.splits:
-            raise HTTPException(status_code=422, detail=f"Splits are required for a disproportionate split.")
+            raise SplitsRequiredError()
         if len(expense.splits) != n:
             raise HTTPException(status_code=422, detail=f"Number of split entries must match group members.")
 
         split_map = {split.user_id: split.percentage for split in expense.splits}
         if set(split_map) != set(member_ids):
-            raise HTTPException(status_code=422, detail=f"Split entries must include every group member.")
+            raise SplitsInputConflict()
 
         decided_amts = [
             (total_amt * Decimal(split_map[user_id]) / Decimal("100")).quantize(

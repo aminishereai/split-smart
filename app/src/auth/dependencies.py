@@ -9,28 +9,31 @@ from app.core.database import SessionDep
 from app.src.auth.exceptions import UserAlreadyExists, UserNotAuthorized, UserNotFound
 from app.src.auth.models import Token, Users, UsersCreate
 from app.src.auth.services import ALGORITHM, SECRET_KEY, authenticate_user, create_access_token, hash_password
+from app.utils.exceptions.base import APIException
 
 credentials_exception = HTTPException(
-    status_code= status.HTTP_401_UNAUTHORIZED,
-    detail= f"User is not authorized",
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail=f"User is not authorized",
     headers={"WWW-Authenticate": "Bearer"}
 )
 
 oauth2_scheme = OAuth2PasswordBearer("auth/login/")
 
-def get_current_user(token : Annotated[str , Depends(oauth2_scheme)] , session : SessionDep) -> Users:
-    try : 
-        payload = jwt.decode(token , SECRET_KEY , [ALGORITHM])
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep) -> Users:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, [ALGORITHM])
         username = payload.get("sub")
         statement = select(Users).where(Users.name == username)
         user = session.exec(statement).one_or_none()
         # Checks for existing user
-        if not user :
+        if not user:
             raise UserNotFound(username=username)
-        
+
         return user
 
-    except Exception:
+    except Exception as exc:
+        if isinstance(exc, APIException):
+            raise
         raise credentials_exception
     
 
