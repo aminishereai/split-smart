@@ -22,3 +22,6 @@ class PaymentsOut(SQLModel):
     payer_id : int
     lender_id : int
     payed_amt : Decimal
+
+class Balance(SQLModel):
+    balance : Decimal | int
