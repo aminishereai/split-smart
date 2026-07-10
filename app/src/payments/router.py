@@ -29,7 +29,7 @@ def post_payments(payment_in  : PaymentsCreate , session : SessionDep , user : C
     return payment
 
 
-@router.get("/" , response_model=Balance)
+@router.get("/view" , response_model=Balance)
 def view_balance(session : SessionDep , user : CurrentUserDep):
     if not user.id :
         raise cred_exceptions
