@@ -40,7 +40,7 @@ def get_groups(session : SessionDep , user : CurrentUserDep):
     return groups
 
 
-@router.get("/{group_id}/invite/{invitation_code}")
+@router.post("/{group_id}/invite/{invitation_code}")
 def get_invited(group_id : int , invitation_code : str , user : CurrentUserDep , session : SessionDep):
     valid_group = verify_group(group_id , invitation_code , session)
     if not valid_group :

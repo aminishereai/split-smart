@@ -39,15 +39,15 @@ class ExpenseIn(SQLModel):
     def validate_split(self):
         if self.split_type == Split.disproportionate :
             if not self.splits :
-                raise HTTPException(status_code=422 , detail=f"Splits of individual users required for disproportionate split.")
+                raise ValueError(f"Splits of individual users required for disproportionate split.")
             
             total = sum(x.percentage for x in self.splits)
             if abs(total - 100) > 0.01 :
-                raise HTTPException(status_code=422 , detail=f"Percentage must sum to 100")
+                raise ValueError(f"Percentage must sum to 100")
             
         if self.split_type == Split.equal :
             if self.splits :
-                raise HTTPException(status_code=422 , detail=f"Splits not required for equal split.")
+                raise ValueError(f"Splits not required for equal split.")
         
         return self
 

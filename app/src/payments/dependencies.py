@@ -23,7 +23,7 @@ def retrieve_payments_paid(session : Session , user_id : int):
     return session.exec(statement).all()
 
 def retrieve_amount_to_get(session : Session , user_id : int):
-    statement = select(Expenses , ExpenseSplit).join(ExpenseSplit).where(Expenses.id == user_id)
+    statement = select(Expenses , ExpenseSplit).join(ExpenseSplit).where(Expenses.user_id == user_id)
     result =  session.exec(statement).all()
     splits = [split for _ , split in result]
     return splits

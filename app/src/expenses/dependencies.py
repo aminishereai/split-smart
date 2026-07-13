@@ -18,7 +18,7 @@ def add_expense (expense_data :ExpenseIn , session : Session , user_id : int , g
 
     if not expense.id :
         raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Expense is not created"
         )
 

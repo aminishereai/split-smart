@@ -35,7 +35,7 @@
     id : int
     user_id : int # foreign_key users.id
     group_id : int # foreign_key groups.id
-    total_amt : float
+    total_amt : Decimal.decimal
     split_type : Literal["disproportionate" , "equal"]
     # primary key -> (user_id , group_id)
     ```
@@ -44,7 +44,7 @@
     ```python 
     user_id : int # foreign_key users.id
     expense_id : int # foreign_key expenses.id
-    decided_amt : float
+    decided_amt : Decimal.decimal
     # primary key -> (user_id , expense_id)
     ```
 
@@ -53,7 +53,7 @@
     id : int # primary key
     payer_id : int # foreign_key users.id
     payee_id : int # foreign_key users.id
-    paid_amt : float
+    paid_amt : Decimal.decimal
 
     ```
 

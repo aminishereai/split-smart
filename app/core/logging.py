@@ -3,8 +3,6 @@ from uuid import uuid4
 
 
 from fastapi import Request
-from h11 import Data
-from passlib import hosts
 from starlette.middleware.base import BaseHTTPMiddleware
 from logging import Formatter, Logger, StreamHandler , getLogger, INFO, DEBUG, WARNING, ERROR, CRITICAL
 from typing import Literal

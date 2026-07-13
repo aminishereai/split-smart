@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -9,6 +10,7 @@ class Payments(SQLModel , table=True):
     payer_id : int = Field(foreign_key="users.id")
     lender_id : int = Field(foreign_key="users.id")
     payed_amt : Decimal = Field(max_digits=10 , decimal_places=2)
+    created_at : datetime = Field(default_factory=datetime.now)
 
 
 # Schemas
