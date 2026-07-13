@@ -28,16 +28,23 @@ def retrieve_amount_to_get(session : Session , user_id : int):
     splits = [split for _ , split in result]
     return splits
 
+def retrieve_recived_payments(session : Session , user_id : int):
+    statement = select(Payments).where(Payments.lender_id == user_id)
+    return session.exec(statement).all()
+
+
 
 def get_balance(session : Session , user_id : int):
     expense_splits_to_pay = retrieve_expenses(session , user_id)
     paid_payments = retrieve_payments_paid(session , user_id)
     splits_to_get = retrieve_amount_to_get(session , user_id)
+    recived_amt = retrieve_recived_payments(session , user_id)
 
     balance = calculate_balance(
         paid=paid_payments,
         to_get=splits_to_get,
-        expenses_split=expense_splits_to_pay
+        expenses_split=expense_splits_to_pay,
+        recived_amt = recived_amt
     )
     
     return balance
