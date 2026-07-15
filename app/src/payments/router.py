@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException
 
 from app.core.database import SessionDep
 from app.src.auth.dependencies import CurrentUserDep
-from app.src.payments.dependencies import add_payment, get_balance
-from app.src.payments.models import Balance, Payments, PaymentsCreate, PaymentsOut
+from app.src.payments.dependencies import add_payment, get_balance, simplify
+from app.src.payments.models import Balance, Payments, PaymentsCreate, PaymentsOut, SimplifiedDebts
 
 
 router = APIRouter(
@@ -40,3 +40,15 @@ def view_balance(session : SessionDep , user : CurrentUserDep):
     )
 
     return Balance(balance=balance)
+
+@router.get("/simplify" , response_model=SimplifiedDebts)
+def simplify_debt(session : SessionDep , user : CurrentUserDep):
+    if not user.id :
+        raise cred_exceptions
+
+    debts_simplified = simplify(
+        session=session,
+        user_id=user.id
+    )
+
+    return debts_simplified

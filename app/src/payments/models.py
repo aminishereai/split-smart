@@ -27,3 +27,8 @@ class PaymentsOut(SQLModel):
 
 class Balance(SQLModel):
     balance : Decimal | int
+
+class SimplifiedDebts(SQLModel):
+    you_owe : list[tuple[int , Decimal]] = []
+    owed_to_you : list[tuple[int , Decimal]] = []
+
