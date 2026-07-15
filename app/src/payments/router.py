@@ -41,7 +41,7 @@ def view_balance(session : SessionDep , user : CurrentUserDep):
 
     return Balance(balance=balance)
 
-@router.get("/simplify" , response_model=SimplifiedDebts)
+@router.get("/simplify" , response_model=SimplifiedDebts , tags=["Debt Simplification"])
 def simplify_debt(session : SessionDep , user : CurrentUserDep):
     if not user.id :
         raise cred_exceptions
